@@ -49,6 +49,8 @@ def harz_Rec(A, img, t, t0 = 0.1):
     img_o[:, :, 0] = (img[:, :, 0] - A[0]) / (np.maximum(t, t0)) + A[0]
     img_o[:, :, 1] = (img[:, :, 1] - A[1]) / (np.maximum(t, t0)) + A[1]
     img_o[:, :, 2] = (img[:, :, 2] - A[2]) / (np.maximum(t, t0)) + A[2]
+    
+    img_o = np.clip(img_o, 0, 1)
 
     return img_o
 
@@ -87,20 +89,17 @@ def Guided_filtering(t, img_gray, width, sigma = 0.0001):
 if __name__ == '__main__':
     
     img = cv2.imread('forest.jpg') / 255
-    img_gray = cv2.imread('IMG_2170.BMP', 0) / 255
+    img_gray = cv2.imread('forest.jpg', 0) / 255
     plt.imshow(img[:, :, ::-1])
     plt.show()
     im_dark = cal_Dark_Channel(img)
-    plt.imshow(im_dark, 'gray')
-    plt.show()
     A = cal_Light_A(im_dark, img)
     trans = cal_trans(A, img)
-    plt.imshow(trans, 'gray')
-    plt.show()
     trans = Guided_filtering(trans, img_gray, 41)
-    plt.imshow(trans, 'gray')
-    plt.show()
     result = harz_Rec(A, img, trans)    
-    plt.imshow(result, 'gray')
+    plt.imshow(result[:, :, ::-1])
     plt.show()
-    
+    gamma = 2.2
+    result_gamma = np.power(result, 1/gamma)
+    plt.imshow(result_gamma[:, :, ::-1])
+    plt.show()
